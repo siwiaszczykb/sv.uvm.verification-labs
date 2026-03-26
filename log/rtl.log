@@ -1,5 +1,0 @@
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/proj/lab1/dut.sv" into library work
-INFO: [VRFC 10-311] analyzing module dut
-ERROR: [VRFC 10-4982] syntax error near ';' [/proj/lab1/dut.sv:2]
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/proj/lab1/dut.sv" into library work
-INFO: [VRFC 10-311] analyzing module dut

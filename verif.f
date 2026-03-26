@@ -1,2 +1,2 @@
-top.sv
-top_tb.sv
+verify/top.sv
+verify/top_tb.sv
