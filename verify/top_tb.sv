@@ -1,6 +1,6 @@
 module top_tb (
-    output logic clk, 
-    output logic rstn
+    output logic    clk, 
+    output logic    rstn
 );
 
 initial clk = 0;

@@ -3,6 +3,8 @@ VERIFY_LOG = log/verify.log
 ELAB_LOG = log/elab.log
 SIM_LOG = log/sim.log
 
+WAVE = 0
+
 all: comp_rtl comp_tb elab run
 
 comp_rtl:
