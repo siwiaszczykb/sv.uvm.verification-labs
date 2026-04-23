@@ -61,7 +61,11 @@ initial begin
     #1000;
 
     execute_i2c(CMD_READ_ID, 17'h00000, 8'h00, "READ ID");
+                            sequence_step <= 4;
 
+                            state_reg <= RX_BYTE; 
+
+                            bit_cnt <= 0;
     #5000;
 
     execute_i2c(CMD_READ_STATUS, 17'h00000, 8'h00, "READ STATUS");

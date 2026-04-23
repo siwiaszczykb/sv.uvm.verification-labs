@@ -11,6 +11,8 @@ logic ready;
 logic r_data_valid;
 logic [23:0] r_data;
 
+logic clk, rstn;
+
 dut dut1 (
     .clk(clk),
     .rstn(rstn),
