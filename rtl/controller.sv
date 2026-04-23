@@ -16,11 +16,12 @@ module controller (
     output logic [23:0] r_data
 );
 
-localparam CMD_READ_ID = 3'd1;
+localparam CMD_READ_ID     = 3'd1;
+localparam CMD_READ_STATUS = 3'd2;
+localparam CMD_READ_DATA   = 3'd3;
+localparam CMD_WRITE_DATA  = 3'd4;
 
-localparam CTRL_MANID_WRITE  = 8'b1111100_0; // Control byte MANID + Write 
-localparam CTRL_MANID_READ   = 8'b1111100_1; // Control byte MANID + Read
-localparam CTRL_DUMMY_EEPROM = 8'b1010000_0; // Dummy write 
+localparam CTRL_DUMMY_EEPROM = 8'b1010000_0; // Dummy write for readid
 
 typedef enum logic [3:0] {
     IDLE,
@@ -35,6 +36,10 @@ typedef enum logic [3:0] {
 } state_t;
 
 state_t state_reg;
+
+logic [2:0]  cmd_reg;
+logic [16:0] addr_reg;
+logic [7:0]  w_data_reg;
 
 logic [3:0] sequence_step;
 logic [2:0] bit_cnt;
@@ -85,6 +90,9 @@ always_ff @(posedge clk or negedge rst) begin
         r_data <= '0;
         sequence_step <= '0;
         scl_phase <= '0;
+        cmd_reg <= '0;
+        addr_reg <= '0;
+        w_data_reg <= '0;
     end 
     else if (i2c_tick) begin
         case (state_reg)
@@ -97,10 +105,11 @@ always_ff @(posedge clk or negedge rst) begin
                 
                 if (valid) begin
                     ready <= 1'b0;
-                    if (cmd == CMD_READ_ID) begin
-                        sequence_step <= 0;
-                        state_reg <= GEN_START;
-                    end
+                    cmd_reg <= cmd;
+                    addr_reg <= addr;
+                    w_data_reg <= w_data;
+                    sequence_step <= 0;
+                    state_reg <= GEN_START;
                 end else begin
                     ready <= 1'b1;
                 end
@@ -117,12 +126,22 @@ always_ff @(posedge clk or negedge rst) begin
                     state_reg <= TX_BYTE;
                     bit_cnt <= 0;
                     
-                    if (sequence_step == 0)      
-                    shift_reg <= CTRL_MANID_WRITE;
-                    else if (sequence_step == 1) 
-                    shift_reg <= CTRL_DUMMY_EEPROM;
-                    else if (sequence_step == 2) 
-                    shift_reg <= CTRL_MANID_READ;
+                    if (sequence_step == 0) begin
+                        if (cmd_reg == CMD_READ_ID)
+                            shift_reg <= 8'b1111100_0;
+                        else if (cmd_reg == CMD_READ_STATUS)
+                            shift_reg <= {4'b1011, addr_reg[16], 2'b00, 1'b0};
+                        else 
+                            shift_reg <= {4'b1010, addr_reg[16], 2'b00, 1'b0};
+                    end 
+                    else if (sequence_step == 3) begin
+                        if (cmd_reg == CMD_READ_ID)
+                            shift_reg <= 8'b1111100_1;
+                        else if (cmd_reg == CMD_READ_STATUS)
+                            shift_reg <= {4'b1011, addr_reg[16], 2'b00, 1'b1};
+                        else 
+                            shift_reg <= {4'b1010, addr_reg[16], 2'b00, 1'b1};
+                    end
                 end
             end
 
@@ -162,23 +181,59 @@ always_ff @(posedge clk or negedge rst) begin
                     scl_reg <= 1'b0;
                     scl_phase <= 0;
 
-                if (sequence_step == 0) begin
-                        sequence_step <= 1;
-                        state_reg <= TX_BYTE; 
-                        bit_cnt <= 0;
-                        shift_reg <= CTRL_DUMMY_EEPROM; 
-                    end else if (sequence_step == 1) begin
-                        sequence_step <= 2;
-                        state_reg <= REP_START_PREP; 
-                    end else if (sequence_step == 2) begin
-                        sequence_step <= 3;
-                        state_reg <= RX_BYTE; bit_cnt <= 0;
+                    if (cmd_reg == CMD_READ_ID) begin
+                        if (sequence_step == 0) begin
+                            sequence_step <= 1;
+                            state_reg <= TX_BYTE; 
+                            bit_cnt <= 0;
+                            shift_reg <= CTRL_DUMMY_EEPROM; 
+                        end else if (sequence_step == 1) begin
+                            sequence_step <= 3; 
+                            state_reg <= REP_START_PREP; 
+                        end else if (sequence_step == 3) begin
+                            sequence_step <= 4;
+                            state_reg <= RX_BYTE; 
+                            bit_cnt <= 0;
+                        end
+                    end 
+                    else if (cmd_reg == CMD_WRITE_DATA) begin
+                        if (sequence_step == 0) begin
+                            shift_reg <= addr_reg[15:8];
+                            sequence_step <= 1;
+                            state_reg <= TX_BYTE; bit_cnt <= 0;
+                        end else if (sequence_step == 1) begin
+                            shift_reg <= addr_reg[7:0];
+                            sequence_step <= 2;
+                            state_reg <= TX_BYTE; bit_cnt <= 0;
+                        end else if (sequence_step == 2) begin
+                            shift_reg <= w_data_reg;
+                            sequence_step <= 3;
+                            state_reg <= TX_BYTE; bit_cnt <= 0;
+                        end else if (sequence_step == 3) begin
+                            state_reg <= GEN_STOP;
+                        end
+                    end 
+                    else if (cmd_reg == CMD_READ_DATA || cmd_reg == CMD_READ_STATUS) begin
+                        if (sequence_step == 0) begin
+                            shift_reg <= addr_reg[15:8];
+                            sequence_step <= 1;
+                            state_reg <= TX_BYTE; bit_cnt <= 0;
+                        end else if (sequence_step == 1) begin
+                            shift_reg <= addr_reg[7:0];
+                            sequence_step <= 2;
+                            state_reg <= TX_BYTE; bit_cnt <= 0;
+                        end else if (sequence_step == 2) begin
+                            sequence_step <= 3;
+                            state_reg <= REP_START_PREP;
+                        end else if (sequence_step == 3) begin
+                            sequence_step <= 4;
+                            state_reg <= RX_BYTE; bit_cnt <= 0;
+                        end
                     end
                 end
             end
 
             REP_START_PREP: begin
-
                 if (scl_phase == 0) begin
                     sda_en <= 1'b1;
                     sda_out <= 1'b1; 
@@ -220,10 +275,12 @@ always_ff @(posedge clk or negedge rst) begin
             SEND_ACK: begin
                 if (scl_phase == 0) begin
                     sda_en <= 1'b1;
-                    if (sequence_step == 5) 
-                    sda_out <= 1'b1; 
-                    else                    
-                    sda_out <= 1'b0; 
+                    
+                    if (cmd_reg == CMD_READ_ID && sequence_step < 6) 
+                        sda_out <= 1'b0; 
+                    else 
+                        sda_out <= 1'b1; 
+                        
                     scl_phase <= 1;
                 end else if (scl_phase == 1) begin
                     scl_reg <= 1'b1;
@@ -234,11 +291,11 @@ always_ff @(posedge clk or negedge rst) begin
                     scl_reg <= 1'b0;
                     scl_phase <= 0;
                     
-                    if (sequence_step == 5) begin
-                        state_reg <= GEN_STOP; 
-                    end else begin
+                    if (cmd_reg == CMD_READ_ID && sequence_step < 6) begin
                         sequence_step <= sequence_step + 1;
                         state_reg <= RX_BYTE; bit_cnt <= 0; 
+                    end else begin
+                        state_reg <= GEN_STOP; 
                     end
                 end
             end
