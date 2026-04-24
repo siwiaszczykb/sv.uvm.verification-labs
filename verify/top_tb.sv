@@ -70,7 +70,7 @@ initial begin
     
     #5000;
 
-    execute_i2c(CMD_READ_STATUS, 17'h00000, 8'h00, "READ STATUS", 1, 24'h0000FF);
+    execute_i2c(CMD_READ_STATUS, 17'h00400, 8'h00, "READ STATUS", 1, 24'h0000FF);
 
     #5000;
     

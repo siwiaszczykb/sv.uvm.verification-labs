@@ -105,6 +105,7 @@ always_ff @(posedge clk or negedge rst) begin
                     addr_reg <= addr;
                     w_data_reg <= w_data;
                     sequence_step <= 0;
+                    rx_buffer <= 24'h0;
                     state_reg <= GEN_START;
                 end else begin
                     ready <= 1'b1;
@@ -113,8 +114,8 @@ always_ff @(posedge clk or negedge rst) begin
 
             GEN_START: begin
                 if (scl_phase == 0) begin
-                    sda_en <= 1'b1;
-                    sda_out <= 1'b0;  
+                    sda_en <= 1'b1; 
+                    sda_out <= 1'b0;
                     scl_phase <= 1;
                 end else if (scl_phase == 1) begin
                     scl_reg <= 1'b0; 
@@ -126,17 +127,17 @@ always_ff @(posedge clk or negedge rst) begin
                         if (cmd_reg == CMD_READ_ID)
                             shift_reg <= 8'b1111100_0;
                         else if (cmd_reg == CMD_READ_STATUS)
-                            shift_reg <= {4'b1011, addr_reg[16], 2'b00, 1'b0};
+                            shift_reg <= {4'b1011, 2'b00, addr_reg[16], 1'b0}; 
                         else 
-                            shift_reg <= {4'b1010, addr_reg[16], 2'b00, 1'b0};
+                            shift_reg <= {4'b1010, 2'b00, addr_reg[16], 1'b0}; 
                     end 
                     else if (sequence_step == 3) begin
                         if (cmd_reg == CMD_READ_ID)
                             shift_reg <= 8'b1111100_1;
                         else if (cmd_reg == CMD_READ_STATUS)
-                            shift_reg <= {4'b1011, addr_reg[16], 2'b00, 1'b1};
+                            shift_reg <= {4'b1011, 2'b00, addr_reg[16], 1'b1}; 
                         else 
-                            shift_reg <= {4'b1010, addr_reg[16], 2'b00, 1'b1};
+                            shift_reg <= {4'b1010, 2'b00, addr_reg[16], 1'b1}; 
                     end
                 end
             end
@@ -298,13 +299,14 @@ always_ff @(posedge clk or negedge rst) begin
 
             GEN_STOP: begin
                 if (scl_phase == 0) begin
+                    sda_en <= 1'b1; 
                     sda_out <= 1'b0;
                     scl_phase <= 1;
                 end else if (scl_phase == 1) begin
                     scl_reg <= 1'b1;
                     scl_phase <= 2;
                 end else if (scl_phase == 2) begin
-                    sda_out <= 1'b1; 
+                    sda_out <= 1'b1; // Fizyczne przejście 0 -> 1 = STOP
                     scl_phase <= 3;
                 end else if (scl_phase == 3) begin
                     state_reg <= DONE;
