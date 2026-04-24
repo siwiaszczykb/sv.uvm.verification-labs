@@ -1,10 +1,11 @@
 `timescale 1ns/10ps
+import tb_pkg::*;
 
 module controller (
     input               clk,
     input               rst,
     input               valid,
-    input logic [2:0]   cmd,
+    input cmd_t   cmd,
     input logic [16:0]  addr,
     input logic [7:0]   w_data,
     output logic        a1, a2,
@@ -15,11 +16,6 @@ module controller (
     output logic        r_data_valid,
     output logic [23:0] r_data
 );
-
-localparam CMD_READ_ID     = 3'd1;
-localparam CMD_READ_STATUS = 3'd2;
-localparam CMD_READ_DATA   = 3'd3;
-localparam CMD_WRITE_DATA  = 3'd4;
 
 localparam CTRL_DUMMY_EEPROM = 8'b1010000_0; // Dummy write for readid
 

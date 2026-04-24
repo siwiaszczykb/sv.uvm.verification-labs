@@ -1,11 +1,12 @@
 `timescale 1ns/10ps
+import tb_pkg::*;
 
 module dut (
     input  logic        clk, 
     input  logic        rstn,
 
     input  logic        valid,
-    input  logic [2:0]  cmd,
+    input  cmd_t  cmd,
     input  logic [16:0] addr,
     input  logic [7:0]  w_data,
     output logic        ready,
