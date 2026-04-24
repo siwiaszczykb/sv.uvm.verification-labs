@@ -82,6 +82,26 @@ initial begin
     execute_i2c(CMD_READ_DATA, 17'h01234, 8'h00, "READ DATA (0xA5 expected)", 1, 24'h0000A5);
     
     #5000;
+    begin
+        logic [16:0] rand_addr;
+        logic [7:0]  rand_data;
+
+        for (int i = 0; i < 10; i++) begin
+            rand_addr = $urandom_range(0, 17'h1FFFF);
+            rand_data = $urandom_range(0, 8'hFF);
+
+            $display("Random test %0d (addr: %h, data: %h) ---", i+1, rand_addr, rand_data);
+
+            execute_i2c(CMD_WRITE_DATA, rand_addr, rand_data, "WRITE RANDOM", 0, 24'h0);
+            
+            #5500000; //hardcoded 5ms magic wait time
+
+            execute_i2c(CMD_READ_DATA, rand_addr, 8'h00, "READ RANDOM", 1, {16'h0000, rand_data});
+            
+            #5000;
+        end
+    end
+
     $display("All tests finished");
     $finish;
 end
