@@ -7,13 +7,14 @@ SIM_LOG = log/sim.log
 WAVE ?= 0
 COV ?= 0
 VERB ?= UVM_LOW
+TEST ?=
 
 ifeq ($(WAVE), 1)
     ELAB_DEBUG = -debug typical
-    SIM_CMD = echo "log_wave -r /; run all; exit" > wave.tcl && xsim top_tb_snap -tclbatch wave.tcl -testplusarg UVM_VERBOSITY=$(VERB)
+    SIM_CMD = echo "log_wave -r /; run all; exit" > wave.tcl && xsim top_tb_snap -tclbatch wave.tcl -testplusarg UVM_VERBOSITY=$(VERB) UVM_TESTNAME=$(TEST)
 else
     ELAB_DEBUG =
-    SIM_CMD = xsim top_tb_snap -R -testplusarg UVM_VERBOSITY=$(VERB)
+    SIM_CMD = xsim top_tb_snap -R -testplusarg UVM_VERBOSITY=$(VERB) UVM_TESTNAME=$(TEST)
 endif
 
 ifeq ($(COV), 1)

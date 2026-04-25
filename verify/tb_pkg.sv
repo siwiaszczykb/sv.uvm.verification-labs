@@ -1,4 +1,7 @@
 `timescale 1ns/10ps 
+import uvm_pkg::*;
+`include "uvm_macros.svh"
+
 package tb_pkg;
     typedef enum logic [2:0] {
         CMD_IDLE        = 3'd0,
