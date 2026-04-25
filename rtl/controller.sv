@@ -1,6 +1,5 @@
 `timescale 1ns/10ps
 import tb_pkg::*;
-import uvm_pkg::*;
 
 module controller (
     input               clk,
