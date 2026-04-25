@@ -6,3 +6,4 @@ xsim.dir/
 *.vdi
 *.str
 log/
+cov/
