@@ -1,5 +1,7 @@
 `timescale 1ns/10ps 
 import tb_pkg::*;
+import uvm_pkg::*;
+`include "uvm_macros.svh"
 
 module top_tb (
     output logic         clk, 
@@ -25,7 +27,8 @@ task execute_i2c(
     input logic [23:0]  expected_data
 );
     begin
-        $display("[%0t] Now doing: %s", $time, op_name);
+        `uvm_info("I2C_TASK", $sformatf("Now doing: %s", op_name), UVM_LOW);
+
         cmd = t_cmd;
         addr = t_addr;
         w_data = t_wdata;
@@ -37,13 +40,13 @@ task execute_i2c(
         
         while (ready == 1'b0) @(posedge clk);
 
-        $display("[%0t] End of %s. Data received: %h", $time, op_name, r_data);
+        `uvm_info("I2C_TASK", $sformatf("End of %s. Data received: %h", op_name, r_data), UVM_LOW);
         
         if (check_enable) begin
             if (r_data !== expected_data) begin
-                $error("[%0t] Error in %s! Expected: %h, Received: %h", $time, op_name, expected_data, r_data);
+                `uvm_error("I2C_TASK", $sformatf("End of %s. Data received: %h", op_name, expected_data, r_data));
             end else begin
-                $display("[%0t] Successfully %s! Valid data received: %h", $time, op_name, r_data);
+                `uvm_info("I2C_TASK", $sformatf("%s successfully. Received valid data: %h", op_name, r_data), UVM_LOW);
             end
         end
     end
@@ -51,7 +54,7 @@ endtask
 
 
 initial begin
-    $display("SIM start");
+    `uvm_info("TB_TOP", "Hello, world! SIM start.", UVM_MEDIUM);
     
     rstn = 0;
     valid = 0;
@@ -59,10 +62,10 @@ initial begin
     addr = 0;
     w_data = 0;
 
-    $display("Reset asserted, waiting 200 ns");
+    `uvm_info("TB_TOP", "Reset asserted, waiting 200 ns", UVM_LOW);
     #200;
     rstn = 1;
-    $display("Reset deasserted, waiting for controller to be ready...");
+    `uvm_info("TB_TOP", "Reset deasserted, waiting for controller to be ready", UVM_LOW);
 
     #1000;
 
@@ -76,7 +79,7 @@ initial begin
     
     execute_i2c(CMD_WRITE_DATA, 17'h01234, 8'hA5, "WRITE DATA (0xA5 to 0x1234 addr)", 0, 24'h0);
     
-    $display("Waiting 5ms for the data to be physically written", $time);
+    `uvm_info("TB_TOP", "Waiting 5ms for the data to be physically written", UVM_LOW);
     #5500000; 
 
     execute_i2c(CMD_READ_DATA, 17'h01234, 8'h00, "READ DATA (0xA5 expected)", 1, 24'h0000A5);
@@ -90,7 +93,7 @@ initial begin
             rand_addr = $urandom_range(0, 17'h1FFFF);
             rand_data = $urandom_range(0, 8'hFF);
 
-            $display("Random test %0d (addr: %h, data: %h) ---", i+1, rand_addr, rand_data);
+            `uvm_info("TB_TOP", $sformatf("Randomized test %0d (addr: %h, data: %h)", i+1, rand_addr, rand_data), UVM_LOW);
 
             execute_i2c(CMD_WRITE_DATA, rand_addr, rand_data, "WRITE RANDOM", 0, 24'h0);
             
@@ -102,7 +105,7 @@ initial begin
         end
     end
 
-    $display("All tests finished");
+    `uvm_info("TB_TOP", "All tests finished", UVM_MEDIUM);
     $finish;
 end
 
