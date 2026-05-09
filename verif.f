@@ -1,3 +1,9 @@
 verify/tb_pkg.sv
+verify/i2c_if.sv
 verify/top.sv
-verify/top_tb.sv
+verify/sequence_item.sv
+verify/seq/i2c_base_seq.sv
+verify/sequencer.sv
+verify/driver.sv
+verify/env.sv
+verify/test.sv

@@ -14,6 +14,7 @@ endfunction
 virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     m_drv = i2c_driver::type_id::create("m_drv", this);
+    m_seqr = i2c_sequencer::type_id::create("m_seqr", this); 
 endfunction
 
 virtual function void connect_phase(uvm_phase phase);

@@ -22,7 +22,7 @@ class i2c_driver extends uvm_driver#(i2c_seq_item);
         vif.w_data <= 8'h0;
 
         wait(vif.rstn == 1'b1);
-    
+        #1000
         forever begin
             seq_item_port.get_next_item(req);
 
@@ -40,7 +40,9 @@ class i2c_driver extends uvm_driver#(i2c_seq_item);
             while (vif.ready == 1'b0) @(posedge vif.clk);
 
             req.r_data = vif.r_data;
-
+            vif.cmd <= CMD_IDLE;
+            vif.addr <= 17'h0;
+            vif.w_data <= 8'h0;
             `uvm_info("DRV", $sformatf("Cmd finished, read value: %h", req.r_data), UVM_HIGH)
             seq_item_port.item_done();
         end

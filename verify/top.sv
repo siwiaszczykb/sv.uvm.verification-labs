@@ -4,36 +4,38 @@ import tb_pkg::*;
 module top ();
 
 logic clk, rstn;
-logic valid;
-cmd_t cmd;
-logic [16:0] addr;
-logic [7:0] w_data;
-logic ready;
-logic r_data_valid;
-logic [23:0] r_data;
+
+initial begin
+    clk = 0;
+    forever #5 clk = ~clk;
+end
+
+initial begin
+    rstn = 0;
+    #200;
+    rstn =1;
+end
+
+i2c_if vif (
+    .clk(clk),
+    .rstn(rstn)
+);
 
 dut dut1 (
     .clk(clk),
     .rstn(rstn),
-    .valid(valid),
-    .cmd(cmd),
-    .addr(addr),
-    .w_data(w_data),
-    .ready(ready),
-    .r_data_valid(r_data_valid),
-    .r_data(r_data)
+    .valid(vif.valid),
+    .cmd(vif.cmd),
+    .addr(vif.addr),
+    .w_data(vif.w_data),
+    .ready(vif.ready),
+    .r_data_valid(vif.r_data_valid),
+    .r_data(vif.r_data)
 );
 
-top_tb testbench (
-    .clk(clk),
-    .rstn(rstn),
-    .valid(valid),
-    .cmd(cmd),
-    .addr(addr),
-    .w_data(w_data),
-    .ready(ready),
-    .r_data_valid(r_data_valid),
-    .r_data(r_data)
-);
+initial begin
+    uvm_config_db#(virtual i2c_if)::set(null, "*", "vif", vif);
+    run_test("i2c_test");
+end
 
 endmodule
