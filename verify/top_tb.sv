@@ -1,7 +1,5 @@
 `timescale 1ns/10ps 
 import tb_pkg::*;
-import uvm_pkg::*;
-`include "uvm_macros.svh"
 
 module top_tb (
     output logic         clk, 

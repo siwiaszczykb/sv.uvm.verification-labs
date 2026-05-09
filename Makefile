@@ -1,4 +1,3 @@
-
 RTL_LOG = log/rtl.log
 VERIFY_LOG = log/verify.log
 ELAB_LOG = log/elab.log
@@ -7,13 +6,16 @@ SIM_LOG = log/sim.log
 WAVE ?= 0
 COV ?= 0
 VERB ?= UVM_LOW
+TEST ?=
 
 ifeq ($(WAVE), 1)
     ELAB_DEBUG = -debug typical
     SIM_CMD = echo "log_wave -r /; run all; exit" > wave.tcl && xsim top_tb_snap -tclbatch wave.tcl -testplusarg UVM_VERBOSITY=$(VERB)
+    OPEN_WAVE = xsim top_tb_snap.wdb -gui
 else
     ELAB_DEBUG =
     SIM_CMD = xsim top_tb_snap -R -testplusarg UVM_VERBOSITY=$(VERB)
+    OPEN_WAVE = 
 endif
 
 ifeq ($(COV), 1)
@@ -41,6 +43,7 @@ elab:
 
 run:
 	$(SIM_CMD) | tee -a $(SIM_LOG) | grep -iE "error|warning" || true
+	$(OPEN_WAVE)
 
 report:
 ifeq ($(COV), 1)
