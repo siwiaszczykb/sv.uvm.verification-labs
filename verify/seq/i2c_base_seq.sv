@@ -7,14 +7,14 @@ function new (string name = "i2c_base_seq");
 endfunction
 
 virtual task body();
-        i2c_seq_item req; // Deklaracja tylko tutaj
+        i2c_seq_item req; 
         logic [16:0] current_addr;
         logic [7:0]  current_data;
 
         req = i2c_seq_item::type_id::create("req");
         start_item(req);
         if (!req.randomize() with { cmd == CMD_READ_ID; addr == 17'h0; w_data == 8'h00; }) 
-            `uvm_error(get_full_name(), "Randomization failed!") // Zmieniono ID
+            `uvm_error(get_full_name(), "Randomization failed!")
         finish_item(req);
         req = i2c_seq_item::type_id::create("req");
         start_item(req);
