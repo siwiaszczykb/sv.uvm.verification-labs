@@ -33,7 +33,7 @@ class i2c_driver extends uvm_driver#(i2c_seq_item);
         
         forever begin
             seq_item_port.get_next_item(req);
-            `uvm_info(get_full_name(), $sformatf("Transaction received: cmd=%s, addr=%h", req.cmd.name(), req.addr), UVM_HIGH) // Zmiana ID zgodnie z NOTE 4
+            `uvm_info(get_full_name(), $sformatf("Transaction received: cmd=%s, addr=%h", req.cmd.name(), req.addr), UVM_HIGH)
 
             vif.cmd <= req.cmd;
             vif.addr <= req.addr;
@@ -51,7 +51,7 @@ class i2c_driver extends uvm_driver#(i2c_seq_item);
             vif.addr <= 17'h0;
             vif.w_data <= 8'h0;
 
-            `uvm_info(get_full_name(), $sformatf("Cmd finished, read value: %h", req.r_data), UVM_HIGH) // Zmiana ID zgodnie z NOTE 4
+            `uvm_info(get_full_name(), $sformatf("Cmd finished, read value: %h", req.r_data), UVM_HIGH) 
             seq_item_port.item_done();
         end
     endtask
