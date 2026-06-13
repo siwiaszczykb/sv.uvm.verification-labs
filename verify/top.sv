@@ -1,4 +1,7 @@
 `timescale 1ns/10ps
+
+import uvm_pkg::*;
+`include "uvm_macros.svh"
 import tb_pkg::*;
 
 module top ();
@@ -35,7 +38,7 @@ dut dut1 (
 
 initial begin
     uvm_config_db#(virtual i2c_if)::set(null, "*", "vif", vif);
-    run_test("i2c_test");
+    run_test();
 end
 
 endmodule
