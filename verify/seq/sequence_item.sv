@@ -1,5 +1,3 @@
-import tb_pkg::*;
-
 class i2c_seq_item extends uvm_sequence_item;
 
 rand bit [16:0]     addr;
