@@ -13,9 +13,11 @@ package tb_pkg;
     } cmd_t;
 
     `include "verify/seq/sequence_item.sv"
+    `include "verify/i2c_config.sv"
     `include "verify/seq/i2c_base_seq.sv"
     `include "verify/seq/sequencer.sv"
     `include "verify/driver.sv"
+    `include "verify/monitor.sv"
     `include "verify/env.sv"
     `include "verify/tests/test.sv"
 
