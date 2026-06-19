@@ -3,9 +3,17 @@ VERIFY_LOG = log/verify.log
 ELAB_LOG = log/elab.log
 SIM_LOG = log/sim.log
 
+#	 stopnie verbosity:
+#    UVM_NONE    = 0,
+#    UVM_LOW     = 100,
+#    UVM_MEDIUM  = 200,
+#    UVM_HIGH    = 300,
+#    UVM_FULL    = 400,
+#    UVM_DEBUG   = 500
+
 WAVE ?= 0
 COV ?= 0
-VERB ?= UVM_LOW
+VERB ?= 200
 TEST ?= i2c_test
 
 ifeq ($(WAVE), 1)
