@@ -15,11 +15,12 @@ package tb_pkg;
     `include "verify/seq/sequence_item.sv"
     `include "verify/i2c_config.sv"
     `include "verify/seq/i2c_base_seq.sv"
-    `include "verify/seq/sequencer.sv"
-    `include "verify/driver.sv"
-    `include "verify/monitor.sv"
-    `include "verify/scoreboard.sv"
-    `include "verify/env.sv"
-    `include "verify/tests/test.sv"
+    `include "verify/seq/i2c_sequencer.sv"
+    `include "verify/i2c_driver.sv"
+    `include "verify/i2c_monitor.sv"
+    `include "verify/i2c_scoreboard.sv"
+    `include "verify/i2c_coverage.sv"
+    `include "verify/i2c_env.sv"
+    `include "verify/tests/i2c_test.sv"
 
 endpackage
