@@ -18,6 +18,7 @@ package tb_pkg;
     `include "verify/seq/sequencer.sv"
     `include "verify/driver.sv"
     `include "verify/monitor.sv"
+    `include "verify/scoreboard.sv"
     `include "verify/env.sv"
     `include "verify/tests/test.sv"
 

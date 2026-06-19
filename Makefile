@@ -13,7 +13,7 @@ SIM_LOG = log/sim.log
 
 WAVE ?= 0
 COV ?= 0
-VERB ?= 200
+VERB ?= UVM_MEDIUM
 TEST ?= i2c_test
 
 ifeq ($(WAVE), 1)
