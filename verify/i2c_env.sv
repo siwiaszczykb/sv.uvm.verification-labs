@@ -5,6 +5,8 @@ class i2c_env extends uvm_env;
 i2c_sequencer m_seqr;
 i2c_driver m_drv;
 i2c_monitor m_mon;
+i2c_scoreboard m_scb;
+i2c_coverage   m_cov;
 
 function new (string name = "i2c_env", uvm_component parent = null);
     super.new (name, parent);
@@ -15,10 +17,14 @@ virtual function void build_phase(uvm_phase phase);
     m_drv = i2c_driver::type_id::create("m_drv", this);
     m_seqr = i2c_sequencer::type_id::create("m_seqr", this); 
     m_mon = i2c_monitor::type_id::create("m_mon", this); 
+    m_scb = i2c_scoreboard::type_id::create("m_scb", this);
+    m_cov  = i2c_coverage::type_id::create("m_cov", this);
 endfunction
 
 virtual function void connect_phase(uvm_phase phase);
     m_drv.seq_item_port.connect(m_seqr.seq_item_export);
+    m_mon.analysis_port.connect(m_scb.item_collected_export);
+    m_mon.analysis_port.connect(m_cov.analysis_export);
 endfunction
 
 endclass

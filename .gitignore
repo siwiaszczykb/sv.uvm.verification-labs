@@ -1,4 +1,5 @@
 xsim.dir/
+xsim.covdb/
 *.log
 *.jou
 *.pb
@@ -7,3 +8,4 @@ xsim.dir/
 *.str
 log/
 cov/
+.vscode/

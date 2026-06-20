@@ -12,13 +12,18 @@ package tb_pkg;
         CMD_WRITE_DATA  = 3'd4
     } cmd_t;
 
+    const int ID = 24'h00D0D0;
+    const int default_mem_val = 8'hFF;
+
     `include "verify/seq/sequence_item.sv"
     `include "verify/i2c_config.sv"
     `include "verify/seq/i2c_base_seq.sv"
-    `include "verify/seq/sequencer.sv"
-    `include "verify/driver.sv"
-    `include "verify/monitor.sv"
-    `include "verify/env.sv"
-    `include "verify/tests/test.sv"
+    `include "verify/seq/i2c_sequencer.sv"
+    `include "verify/i2c_driver.sv"
+    `include "verify/i2c_monitor.sv"
+    `include "verify/i2c_scoreboard.sv"
+    `include "verify/i2c_coverage.sv"
+    `include "verify/i2c_env.sv"
+    `include "verify/tests/i2c_test.sv"
 
 endpackage

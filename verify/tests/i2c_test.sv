@@ -1,3 +1,5 @@
+`define ENABLE_COVERAGE 1
+
 class i2c_test extends uvm_test;
 
 `uvm_component_utils(i2c_test);
@@ -13,6 +15,10 @@ endfunction
 virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     cfg = i2c_config::type_id::create("cfg");
+    cfg.scoreboard_enable = 1; 
+    `ifdef ENABLE_COVERAGE
+        cfg.coverage_enable = 1;
+    `endif
     uvm_config_db#(i2c_config)::set(this, "*", "cfg", cfg);
     m_env = i2c_env::type_id::create("m_env", this);
     uvm_top.set_timeout(60_000_000ns, 1); 
