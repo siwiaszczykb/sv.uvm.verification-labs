@@ -15,6 +15,14 @@ package tb_pkg;
     const int ID = 24'h00D0D0;
     const int default_mem_val = 8'hFF;
 
+    typedef enum logic [2:0] {
+        SINGLE  = 3'd0,
+        SHORT   = 3'd1,
+        MEDIUM  = 3'd2,
+        LONG    = 3'd3,
+        MAX     = 3'd4
+    } data_len_t;
+
     `include "verify/seq/sequence_item.sv"
     `include "verify/i2c_config.sv"
     `include "verify/seq/i2c_base_seq.sv"
