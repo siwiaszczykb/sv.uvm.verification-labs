@@ -32,7 +32,7 @@ class i2c_scoreboard extends uvm_scoreboard;
     endfunction
 
   virtual function void check_read_id(i2c_seq_item item);
-    if(item.r_data !== 24'h00D0D0) begin
+    if(item.r_data !== tb_pkg::ID) begin
       `uvm_error(get_full_name(), $sformatf("Read ID mismatch, expected: 00d0d0, received: %h", item.r_data))
        errors++;
     end else begin
@@ -57,7 +57,7 @@ class i2c_scoreboard extends uvm_scoreboard;
       if(memory.exists(item.addr)) begin
           expected_data = memory[item.addr];
       end else begin
-          expected_data = 8'hFF;
+          expected_data = tb_pkg::default_mem_val;
       end
 
       if(item.r_data[7:0] !== expected_data) begin
