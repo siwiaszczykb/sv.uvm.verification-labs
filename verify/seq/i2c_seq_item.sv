@@ -1,8 +1,11 @@
+import tb_pkg::*;
+
 class i2c_seq_item extends uvm_sequence_item;
 
 rand bit [16:0]     addr;
 rand cmd_t          cmd;
 rand bit [7:0]      w_data;
+rand data_len_t     data_len;
 
 bit      [23:0]     r_data;
 bit                 r_data_valid;
@@ -20,5 +23,22 @@ function new(string name = "i2c_seq_item");
 endfunction
 
 constraint notidle { cmd != CMD_IDLE; };
+
+constraint c_cmd_dist {
+    cmd dist {
+        CMD_WRITE_DATA := 50,
+        CMD_READ_DATA := 50
+    };
+}
+
+constraint data_dist {
+    data_len dist {
+        SHORT  := 40,
+        MEDIUM := 30,
+        LONG   := 20,
+        SINGLE := 5,
+        MAX    := 5
+    };
+}
 
 endclass

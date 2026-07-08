@@ -5,7 +5,7 @@ class i2c_test extends uvm_test;
 `uvm_component_utils(i2c_test);
 
 i2c_env m_env;
-i2c_base_seq seq;
+i2c_random_seq seq;
 i2c_config cfg;
 
 function new (string name = "i2c_test", uvm_component parent = null);
@@ -21,7 +21,7 @@ virtual function void build_phase(uvm_phase phase);
     `endif
     uvm_config_db#(i2c_config)::set(this, "*", "cfg", cfg);
     m_env = i2c_env::type_id::create("m_env", this);
-    uvm_top.set_timeout(60_000_000ns, 1); 
+    uvm_top.set_timeout(200_000_000ns, 1); 
 endfunction
 
 virtual function void end_of_elaboration_phase(uvm_phase phase);
@@ -33,7 +33,7 @@ virtual function void end_of_elaboration_phase(uvm_phase phase);
 endfunction
 
 virtual task main_phase(uvm_phase phase);
-    seq = i2c_base_seq::type_id::create("seq");
+    seq = i2c_random_seq::type_id::create("seq");
     phase.phase_done.set_drain_time(this, 50000ns);
     phase.raise_objection(this);
     `uvm_info("TEST", "Sequence starting", UVM_LOW)
