@@ -25,6 +25,7 @@ package tb_pkg;
 
     `include "verify/seq/i2c_seq_item.sv"
     `include "verify/i2c_config.sv"
+    `include "verify/seq/i2c_long_read_seq.sv"
     `include "verify/seq/i2c_random_seq.sv"
     `include "verify/seq/i2c_base_seq.sv"
     `include "verify/seq/i2c_sequencer.sv"
@@ -33,6 +34,7 @@ package tb_pkg;
     `include "verify/i2c_scoreboard.sv"
     `include "verify/i2c_coverage.sv"
     `include "verify/i2c_env.sv"
+    `include "verify/tests/i2c_long_read_test.sv"
     `include "verify/tests/i2c_test.sv"
 
 endpackage
