@@ -29,6 +29,7 @@ dut dut1 (
     .rstn(rstn),
     .valid(vif.valid),
     .cmd(vif.cmd),
+    .data_len(vif.data_len),
     .addr(vif.addr),
     .w_data(vif.w_data),
     .ready(vif.ready),

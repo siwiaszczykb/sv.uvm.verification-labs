@@ -5,9 +5,10 @@ module controller (
     input               clk,
     input               rst,
     input               valid,
-    input cmd_t   cmd,
+    input cmd_t         cmd,
+    input data_len_t    data_len,
     input logic [16:0]  addr,
-    input logic [7:0]   w_data,
+    input logic [127:0] w_data,
     output logic        a1, a2,
     output logic        wp,
     output logic        scl,
@@ -33,9 +34,23 @@ typedef enum logic [3:0] {
 
 state_t state_reg;
 
-logic [2:0]  cmd_reg;
-logic [16:0] addr_reg;
-logic [7:0]  w_data_reg;
+logic [2:0]     cmd_reg;
+logic [16:0]    addr_reg;
+logic [127:0]   w_data_reg;
+data_len_t      data_len_reg;
+logic [4:0]     byte_cnt;
+
+logic [4:0] target_bytes;
+always_comb begin
+    case (data_len_reg)
+        SINGLE: target_bytes = 5'd1;
+        SHORT:  target_bytes = 5'd2;
+        MEDIUM: target_bytes = 5'd4;
+        LONG:   target_bytes = 5'd8;
+        MAX:    target_bytes = 5'd16;
+        default: target_bytes = 5'd1;
+    endcase
+end
 
 logic [3:0] sequence_step;
 logic [2:0] bit_cnt;
@@ -104,6 +119,8 @@ always_ff @(posedge clk or negedge rst) begin
                     cmd_reg <= cmd;
                     addr_reg <= addr;
                     w_data_reg <= w_data;
+                    data_len_reg <= data_len;
+                    byte_cnt <= 0;
                     sequence_step <= 0;
                     rx_buffer <= 24'h0;
                     state_reg <= GEN_START;
@@ -203,8 +220,13 @@ always_ff @(posedge clk or negedge rst) begin
                             sequence_step <= 2;
                             state_reg <= TX_BYTE; bit_cnt <= 0;
                         end else if (sequence_step == 2) begin
-                            shift_reg <= w_data_reg;
-                            sequence_step <= 3;
+                            shift_reg <= w_data_reg[7:0];
+                            w_data_reg <= w_data_reg >> 8; 
+                            if (byte_cnt == (target_bytes - 1)) begin
+                                sequence_step <= 3; 
+                            end else begin
+                                byte_cnt <= byte_cnt + 1; 
+                            end
                             state_reg <= TX_BYTE; bit_cnt <= 0;
                         end else if (sequence_step == 3) begin
                             state_reg <= GEN_STOP;

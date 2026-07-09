@@ -4,7 +4,7 @@ class i2c_seq_item extends uvm_sequence_item;
 
 rand bit [16:0]     addr;
 rand cmd_t          cmd;
-rand bit [7:0]      w_data;
+rand bit [127:0]      w_data;
 rand data_len_t     data_len;
 
 bit      [23:0]     r_data;
@@ -39,6 +39,13 @@ constraint data_dist {
         SINGLE := 5,
         MAX    := 5
     };
+}
+
+constraint c_w_data_mask {
+    (data_len == SINGLE) -> w_data[127:8]  == 0;
+    (data_len == SHORT)  -> w_data[127:16] == 0;
+    (data_len == MEDIUM) -> w_data[127:32] == 0;
+    (data_len == LONG)   -> w_data[127:64] == 0;
 }
 
 endclass
