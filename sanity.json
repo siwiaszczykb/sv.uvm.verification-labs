@@ -1,0 +1,6 @@
+{
+    "coverage_default": 0,
+    "tests": [
+        { "name": "i2c_test", "expect_error": 0 }
+    ]
+}
