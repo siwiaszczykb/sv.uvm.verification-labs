@@ -25,7 +25,7 @@ endfunction
 constraint notidle { cmd != CMD_IDLE; };
 
 constraint c_cmd_dist {
-    cmd dist {
+    soft cmd dist {
         CMD_WRITE_DATA := 50,
         CMD_READ_DATA := 50
     };

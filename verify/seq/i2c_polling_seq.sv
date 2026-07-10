@@ -33,7 +33,6 @@ class i2c_polling_seq extends uvm_sequence#(i2c_seq_item);
             #500000; 
             
             req = i2c_seq_item::type_id::create("req");
-            req.c_cmd_dist.constraint_mode(0);
             
             start_item(req);
             if(!req.randomize() with {
