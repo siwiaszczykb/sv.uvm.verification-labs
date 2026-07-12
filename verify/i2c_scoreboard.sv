@@ -47,8 +47,21 @@ class i2c_scoreboard extends uvm_scoreboard;
     endfunction
 
   virtual function void store_data(i2c_seq_item item);
-        memory[item.addr] = item.w_data;
-        `uvm_info(get_full_name(), $sformatf("Data stored at addr %h: %h", item.addr, item.w_data), UVM_HIGH)
+        int bytes_to_write;
+
+        case(item.data_len)
+            SINGLE: bytes_to_write = 1;
+            SHORT: bytes_to_write = 2;
+            MEDIUM: bytes_to_write = 4;
+            LONG: bytes_to_write = 8;
+            MAX: bytes_to_write = 16;
+            default: bytes_to_write = 1;
+        endcase
+
+        for(int i = 0; i<bytes_to_write; i++) begin
+            memory[item.addr + i] = item.w_data[i*8 +: 8];
+            `uvm_info(get_full_name(), $sformatf("Data stored at addr %h: %h", item.addr + i, item.w_data[i*8 +: 8]), UVM_HIGH)
+        end
     endfunction
 
   virtual function void check_read_data(i2c_seq_item item);

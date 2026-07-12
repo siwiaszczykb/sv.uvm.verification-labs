@@ -13,10 +13,22 @@ package tb_pkg;
     } cmd_t;
 
     const int ID = 24'h00D0D0;
-    const int default_mem_val = 8'hFF;
+    const int default_mem_val = 8'h00;
 
-    `include "verify/seq/sequence_item.sv"
+    typedef enum logic [2:0] {
+        SINGLE  = 3'd0,
+        SHORT   = 3'd1,
+        MEDIUM  = 3'd2,
+        LONG    = 3'd3,
+        MAX     = 3'd4
+    } data_len_t;
+
+    `include "verify/seq/i2c_seq_item.sv"
     `include "verify/i2c_config.sv"
+    `include "verify/seq/i2c_error_seq.sv"
+    `include "verify/seq/i2c_polling_seq.sv"
+    `include "verify/seq/i2c_long_read_seq.sv"
+    `include "verify/seq/i2c_random_seq.sv"
     `include "verify/seq/i2c_base_seq.sv"
     `include "verify/seq/i2c_sequencer.sv"
     `include "verify/i2c_driver.sv"
@@ -24,6 +36,9 @@ package tb_pkg;
     `include "verify/i2c_scoreboard.sv"
     `include "verify/i2c_coverage.sv"
     `include "verify/i2c_env.sv"
+    `include "verify/tests/i2c_error_test.sv"
+    `include "verify/tests/i2c_polling_test.sv"
+    `include "verify/tests/i2c_long_read_test.sv"
     `include "verify/tests/i2c_test.sv"
 
 endpackage
