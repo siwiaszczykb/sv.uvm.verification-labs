@@ -1,3 +1,13 @@
+# PR 8
+
+* data length enum added to pkg
+* gitignore modified to exclude lab2/python for a while due to venv's mess; duplicate modules removed after filename=class name adjustments; data length & distribution added
+* begining of adjustments to controller so that it finally accepts burst data packages, not tested yet - I am going to sleep, will find out tommorow
+* controller has been adjusted & tested so that it now accepts burst data; scoreboard has been adjusted so that it does not cut off data, but rather detects data lengths and changes its width appropriately; sequence and test for long read have been implemented
+* slightly adjusted gitignore to include the eternal enemy - random directories appearing from nowhere; implemented and tested polling & error sequences and tests
+* json files for regression and sanity checks defined; python script to handle the entire environment created and tested - everything seems to work correctly
+* cmd distribution constraint changed to soft for ability to override it later
+
 # PR 7
 
 * minor changes to the structure of directories. all modules were changed to correctly import tb_pkg. driver was adjusted to be split between reset and main phase. added uvm_testname variable to make… …file.
