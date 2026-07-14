@@ -2,16 +2,16 @@
 import tb_pkg::*;
 
 module dut (
-    input  logic        clk, 
-    input  logic        rstn,
-
-    input  logic        valid,
-    input  cmd_t  cmd,
-    input  logic [16:0] addr,
-    input  logic [7:0]  w_data,
-    output logic        ready,
-    output logic        r_data_valid,
-    output logic [23:0] r_data
+    input  logic            clk, 
+    input  logic            rstn,
+    input  logic            valid,
+    input  cmd_t            cmd,
+    input  data_len_t       data_len,
+    input  logic [16:0]     addr,
+    input  logic [127:0]    w_data,
+    output logic            ready,
+    output logic            r_data_valid,
+    output logic [23:0]     r_data
 );
 
 logic a1_net, a2_net, wp_net;
@@ -36,6 +36,7 @@ controller memorycontroller (
     .rst(rstn),
     .valid(valid),
     .cmd(cmd),
+    .data_len(data_len),
     .addr(addr),
     .w_data(w_data),
     .a1(a1_net),
