@@ -9,5 +9,9 @@ xsim.covdb/
 log/
 cov/
 .vscode/
+lab2/venv
+lab2/sim_build
+lab2/__pycache__
+lab2/results.xml
 lab2/
 .Xil/
