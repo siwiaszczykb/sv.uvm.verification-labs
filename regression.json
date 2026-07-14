@@ -1,0 +1,9 @@
+{
+    "coverage_default": 1,
+    "tests": [
+        { "name": "i2c_test", "expect_error": 0 },
+        { "name": "i2c_long_read_test", "expect_error": 0 },
+        { "name": "i2c_polling_test", "expect_error": 0 },
+        { "name": "i2c_error_test", "expect_error": 1 }
+    ]
+}

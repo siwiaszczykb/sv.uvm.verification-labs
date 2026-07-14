@@ -1,14 +1,12 @@
 `timescale 1ns/10ps
-import tb_pkg::*;
 
 module controller (
     input               clk,
     input               rst,
     input               valid,
-    input cmd_t         cmd,
-    input data_len_t    data_len,
+    input logic [2:0]   cmd,
     input logic [16:0]  addr,
-    input logic [127:0] w_data,
+    input logic [7:0]   w_data,
     output logic        a1, a2,
     output logic        wp,
     output logic        scl,
@@ -17,6 +15,11 @@ module controller (
     output logic        r_data_valid,
     output logic [23:0] r_data
 );
+
+localparam CMD_READ_ID     = 3'd1;
+localparam CMD_READ_STATUS = 3'd2;
+localparam CMD_READ_DATA   = 3'd3;
+localparam CMD_WRITE_DATA  = 3'd4;
 
 localparam CTRL_DUMMY_EEPROM = 8'b1010000_0; // Dummy write for readid
 
@@ -34,23 +37,9 @@ typedef enum logic [3:0] {
 
 state_t state_reg;
 
-logic [2:0]     cmd_reg;
-logic [16:0]    addr_reg;
-logic [127:0]   w_data_reg;
-data_len_t      data_len_reg;
-logic [4:0]     byte_cnt;
-
-logic [4:0] target_bytes;
-always_comb begin
-    case (data_len_reg)
-        SINGLE: target_bytes = 5'd1;
-        SHORT:  target_bytes = 5'd2;
-        MEDIUM: target_bytes = 5'd4;
-        LONG:   target_bytes = 5'd8;
-        MAX:    target_bytes = 5'd16;
-        default: target_bytes = 5'd1;
-    endcase
-end
+logic [2:0]  cmd_reg;
+logic [16:0] addr_reg;
+logic [7:0]  w_data_reg;
 
 logic [3:0] sequence_step;
 logic [2:0] bit_cnt;
@@ -119,10 +108,7 @@ always_ff @(posedge clk or negedge rst) begin
                     cmd_reg <= cmd;
                     addr_reg <= addr;
                     w_data_reg <= w_data;
-                    data_len_reg <= data_len;
-                    byte_cnt <= 0;
                     sequence_step <= 0;
-                    rx_buffer <= 24'h0;
                     state_reg <= GEN_START;
                 end else begin
                     ready <= 1'b1;
@@ -131,8 +117,8 @@ always_ff @(posedge clk or negedge rst) begin
 
             GEN_START: begin
                 if (scl_phase == 0) begin
-                    sda_en <= 1'b1; 
-                    sda_out <= 1'b0;
+                    sda_en <= 1'b1;
+                    sda_out <= 1'b0;  
                     scl_phase <= 1;
                 end else if (scl_phase == 1) begin
                     scl_reg <= 1'b0; 
@@ -144,17 +130,17 @@ always_ff @(posedge clk or negedge rst) begin
                         if (cmd_reg == CMD_READ_ID)
                             shift_reg <= 8'b1111100_0;
                         else if (cmd_reg == CMD_READ_STATUS)
-                            shift_reg <= {4'b1011, 2'b00, addr_reg[16], 1'b0}; 
+                            shift_reg <= {4'b1011, addr_reg[16], 2'b00, 1'b0};
                         else 
-                            shift_reg <= {4'b1010, 2'b00, addr_reg[16], 1'b0}; 
+                            shift_reg <= {4'b1010, addr_reg[16], 2'b00, 1'b0};
                     end 
                     else if (sequence_step == 3) begin
                         if (cmd_reg == CMD_READ_ID)
                             shift_reg <= 8'b1111100_1;
                         else if (cmd_reg == CMD_READ_STATUS)
-                            shift_reg <= {4'b1011, 2'b00, addr_reg[16], 1'b1}; 
+                            shift_reg <= {4'b1011, addr_reg[16], 2'b00, 1'b1};
                         else 
-                            shift_reg <= {4'b1010, 2'b00, addr_reg[16], 1'b1}; 
+                            shift_reg <= {4'b1010, addr_reg[16], 2'b00, 1'b1};
                     end
                 end
             end
@@ -220,13 +206,8 @@ always_ff @(posedge clk or negedge rst) begin
                             sequence_step <= 2;
                             state_reg <= TX_BYTE; bit_cnt <= 0;
                         end else if (sequence_step == 2) begin
-                            shift_reg <= w_data_reg[7:0];
-                            w_data_reg <= w_data_reg >> 8; 
-                            if (byte_cnt == (target_bytes - 1)) begin
-                                sequence_step <= 3; 
-                            end else begin
-                                byte_cnt <= byte_cnt + 1; 
-                            end
+                            shift_reg <= w_data_reg;
+                            sequence_step <= 3;
                             state_reg <= TX_BYTE; bit_cnt <= 0;
                         end else if (sequence_step == 3) begin
                             state_reg <= GEN_STOP;
@@ -321,14 +302,13 @@ always_ff @(posedge clk or negedge rst) begin
 
             GEN_STOP: begin
                 if (scl_phase == 0) begin
-                    sda_en <= 1'b1; 
                     sda_out <= 1'b0;
                     scl_phase <= 1;
                 end else if (scl_phase == 1) begin
                     scl_reg <= 1'b1;
                     scl_phase <= 2;
                 end else if (scl_phase == 2) begin
-                    sda_out <= 1'b1; // Fizyczne przejście 0 -> 1 = STOP
+                    sda_out <= 1'b1; 
                     scl_phase <= 3;
                 end else if (scl_phase == 3) begin
                     state_reg <= DONE;
